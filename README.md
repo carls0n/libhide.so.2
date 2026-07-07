@@ -10,7 +10,7 @@ libhide.so.2 hides from all the typical tools that we rely on to tell us whats g
 [+] Hides a specified directory<br>
 [+] Hides the entry in /etc/ld.so.preload
 
-Also, you can get a rootshell by typing rootshell=1 su<br>
+Also, you can get a rootshell by typing 'rootshell=1 su' in your terminal<br>
 
 So then, with all the hiding information this rootkit does, how do we find it?<br>
 There are a couple simple forensics tools that we can use in order to determine what is going on here.<br>
