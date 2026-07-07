@@ -48,7 +48,8 @@ marc@archlinux:$ cat /proc/self/maps
 7ffd8784a000-7ffd8786b000 rw-p 00000000 00:00 0                          [stack]
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
 ```
-As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory. At least thats what we're being told!
+As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
+At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if attacker purposely hides it from virtual memory.
 
 You can also find this shared library by runing ldd /usr/bin/lsof.<br>
 ```
