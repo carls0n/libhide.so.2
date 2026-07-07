@@ -1,6 +1,6 @@
 # libhide.so.2
 A userland ld_preloader rootkit for the purpose of learning  a little bit about computer forensics.<br><br>
-libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with out computer, including<br>
+libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our computer, including<br>
 
 [+] Hides from ps<br>
 [+] Hides from netstat and ss commands<br>
