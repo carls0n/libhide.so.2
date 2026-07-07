@@ -1,6 +1,6 @@
 # libhide.so.2
 A userland ld preload rootkit for the purpose of learning  a little bit about computer forensics.<br><br>
-libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our computer, including<br>
+libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our system, including<br>
 
 [+] Hides a process from ps<br>
 [+] Hides a specified port from netstat and ss commands<br>
@@ -12,9 +12,9 @@ libhide.so.2 hides from all the typical tools that we rely on to tell us whats g
 Also, you can get a rootshell by typing 'rootshell=1 su' in your terminal<br>
 
 So then, with all the hiding information this rootkit does, how do we find it?<br>
-There are a couple simple forensics tools that we can use in order to determine what is going on here.<br>
+There are a couple simple forensic tools that we can use in order to determine what is going on here.<br>
 
-THe first tool we can use reads virtual memory and determines what shared libraries are loaded into memory. Below is an example after having loaded libhide.so.2 into memory via the ld preloader.<br><br>
+THe first tool we can use reads virtual memory and lists what shared libraries are loaded into memory. Below is an example after having loaded libhide.so.2 into memory via the ld preloader.<br><br>
 ```
 marc@archlinux:$ cat /proc/self/maps
 55ac55b8a000-55ac55b8c000 r--p 00000000 00:19 18090                      /usr/bin/cat
@@ -50,7 +50,7 @@ marc@archlinux:$ cat /proc/self/maps
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
 ```
 As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
-At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from virtual memory.
+At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory.
 Below is the code needed to hide from cat /proc/self/maps
 ```
 FILE *fopen(const char *pathname, const char *mode) {
@@ -109,7 +109,7 @@ marc@archlinux:$ ldd /usr/bin/lsof
 	libkeyutils.so.1 => /usr/lib/libkeyutils.so.1 (0x00007f59a09a3000)
 	libresolv.so.2 => /usr/lib/libresolv.so.2 (0x00007f59a0991000)
   ```
-And finally, strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.
+And finally, it's strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
 ```
 openat(AT_FDCWD, "/etc/ld.so.preload.dummy", O_RDONLY) = 6
@@ -119,7 +119,11 @@ Earlier, in the results of strace, we also find
 openat(AT_FDCWD, "/usr/local/lib/libhide.so.2", O_RDONLY|O_CLOEXEC) = 6
 ```
 
-So then, now that we are armed with this information, we can easily disable this rootkit. Simple change the name of the hidden libary. mv /usr/local/lib/libhide.so.2 /usr/local/lib/libhide.so.2.tmp. Once that is done,
+So then, now that we are armed with this information, we can easily disable this rootkit. Simple change the name of the hidden libary.
+```
+mv /usr/local/lib/libhide.so.2 /usr/local/lib/libhide.so.2.tmp
+```
+ Once that is done,
 you should be able to open the real /etc/ld.so.preload and simply remove the line that loads the shared library (/usr/local/lib/libhide.so.2). Now, our system tools start telling us what is really going on.
 secret_dir is now revealed and also the shared library itself.
 
