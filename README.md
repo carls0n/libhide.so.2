@@ -113,6 +113,10 @@ Heres what the line looks like when we run strace cat /etc/ld.so.preload
 ```
 openat(AT_FDCWD, "/etc/ld.so.preload.dummy", O_RDONLY) = 6
 ```
+Earlier, in the results of strace, we also find
+```
+openat(AT_FDCWD, "/usr/local/lib/libhide.so.2", O_RDONLY|O_CLOEXEC) = 6
+```
 
 So then, now that we are armed with this information, we can easily disable this rootkit. Simple change the name of the hidden libary. mv /usr/local/lib/libhide.so.2 /usr/local/lib/libhide.so.2.tmp. Once that is done,
 you should be able to open the real /etc/ld.so.preload and simply remove the line that loads the shared library (/usr/local/lib/libhide.so.2). Now, our system tools start telling us what is really going on.
