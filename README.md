@@ -2,11 +2,10 @@
 A userland ld preload rootkit for the purpose of learning  a little bit about computer forensics.<br><br>
 libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our computer, including<br>
 
-[+] Hides from ps<br>
-[+] Hides from netstat and ss commands<br>
+[+] Hides a process from ps<br>
+[+] Hides a specified port from netstat and ss commands<br>
 [+] Hides from lsof<br>
 [+] Hides itself (libhide.so.2)<br>
-[+] Hides a specified port<br>
 [+] Hides a specified directory<br>
 [+] Hides the entry in /etc/ld.so.preload
 
@@ -51,7 +50,7 @@ marc@archlinux:$ cat /proc/self/maps
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
 ```
 As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
-At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if attacker purposely hides it from virtual memory.
+At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from virtual memory.
 Below is the code needed to hide from cat /proc/self/maps
 ```
 FILE *fopen(const char *pathname, const char *mode) {
@@ -110,7 +109,7 @@ marc@archlinux:$ ldd /usr/bin/lsof
 	libkeyutils.so.1 => /usr/lib/libkeyutils.so.1 (0x00007f59a09a3000)
 	libresolv.so.2 => /usr/lib/libresolv.so.2 (0x00007f59a0991000)
   ```
-And finally, strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy is being opened, so it appears to us that there are no shared libraries being loaded.
+And finally, strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
 ```
 openat(AT_FDCWD, "/etc/ld.so.preload.dummy", O_RDONLY) = 6
