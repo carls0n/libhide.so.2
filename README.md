@@ -50,7 +50,13 @@ marc@archlinux:$ cat /proc/self/maps
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
 ```
 As you can see above, clearly libhide.so.2 is being used here. In addition, if we run ls -l /usr/local/lib/, we see that there is nothing listed in that directory
-At least thats what we're being told! Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as libhide.so.3 or change the name of LIB_TO_HIDE  in source.
+At least thats what we're being told! <br><br>
+Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as libhide.so.3 or change the name of LIB_TO_HIDE  in source.<br><br>
+Onvce you have it compiled, you can test it as follows
+```
+LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
+```
+This will result in libhide.so.3 not being shown even though we are preloading it.<br>
 
 You can also find this shared library by runing ldd /usr/bin/lsof.<br>
 ```
