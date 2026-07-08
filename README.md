@@ -7,6 +7,7 @@ libhide.so.2 hides from all the typical tools that we rely on to tell us whats g
 [+] Hides from lsof<br>
 [+] Hides itself (libhide.so.2)<br>
 [+] Hides a specified directory<br>
+[+] Hides entry in /etc/ld.so.preload
 
 Also, you can get a rootshell by typing 'rootshell=1 su' in your terminal<br>
 
@@ -73,7 +74,6 @@ Onvce you have it compiled, you can test it as follows
 LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
 ```
 This will result in libhide.so.3 not being shown even though we are preloading it.<br><br>
-I have uploaded libdummy.c, which redircets a call using cat /etc/ld.so.preload to a blank dummy file so that user doesnt see the entry in /etc/ld.so.preload<br>
 
 And finally, it's strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.<br><br>
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
