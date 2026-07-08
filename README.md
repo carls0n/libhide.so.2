@@ -73,7 +73,7 @@ Onvce you have it compiled, you can test it as follows
 ```
 LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
 ```
-This will result in libhide.so.3 not being shown even though we are preloading it.<br><br>
+This will result in libhide.so.3 not being shown even though we are preloading it.<br>
 
 And finally, it's strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.<br><br>
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
@@ -88,7 +88,7 @@ So then, now that we are armed with this information, we can easily disable this
 ```
 sudo mv /usr/local/lib/libhide.so.2 /usr/local/lib/libhide.so.2.tmp
 ```
- Once that is done,
+Once that is done,
 you should be able to open the real /etc/ld.so.preload and simply remove the line that loads the shared library (/usr/local/lib/libhide.so.2). Now, our system tools start telling us what is really going on.
 secret_dir is now revealed and also the shared library itself.
 
