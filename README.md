@@ -14,7 +14,7 @@ Also, you can get a rootshell by typing 'rootshell=1 su' in your terminal<br>
 So then, with all the hiding information this rootkit does, how do we find it?<br>
 There are a couple simple forensic tools that we can use in order to determine what is going on here.<br>
 
-The first tool we can use reads virtual memory and lists what shared libraries are loaded into memory. Below is an example after having loaded libhide.so.2 into memory via the ld preloader.<br><br>
+The first tool we can use reads virtual memory and lists what shared libraries are loaded into memory. Below is an example after having loaded libhide.so.2 into memory via the ld preloader.<br>
 ```
 marc@archlinux:$ cat /proc/self/maps
 55ac55b8a000-55ac55b8c000 r--p 00000000 00:19 18090                      /usr/bin/cat
