@@ -68,7 +68,7 @@ marc@archlinux:$ ldd /usr/bin/lsof
 	libkeyutils.so.1 => /usr/lib/libkeyutils.so.1 (0x00007f59a09a3000)
 	libresolv.so.2 => /usr/lib/libresolv.so.2 (0x00007f59a0991000)
   ```
-Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as libhide.so.3 or change the name of LIB_TO_HIDE  in source.<br><br>
+Another note, there is a way to hide this entry from cat /proc/self/maps and ldd. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as libhide.so.3 or change the name of LIB_TO_HIDE  in source.<br><br>
 Once you have it compiled, you can test it as follows
 ```
 LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
