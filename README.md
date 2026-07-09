@@ -73,7 +73,7 @@ Once you have it compiled, you can test it as follows
 ```
 LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
 ```
-This will result in libhide.so.3 not being shown even though we are preloading it.<br>
+This will result in libhide.so.3 not being shown even though we are preloading it. Also works with ldd.<br>
 
 And finally, it's strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.<br><br>
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
