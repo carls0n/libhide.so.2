@@ -68,12 +68,12 @@ marc@archlinux:$ ldd /usr/bin/lsof
 	libkeyutils.so.1 => /usr/lib/libkeyutils.so.1 (0x00007f59a09a3000)
 	libresolv.so.2 => /usr/lib/libresolv.so.2 (0x00007f59a0991000)
   ```
-Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as libhide.so.3 or change the name of LIB_TO_HIDE  in source.<br><br>
+Another note, there is a way to hide this entry from cat /proc/self/maps. So, this may not show up if an attacker purposely hides it from being read in virtual memory. I have included the source code for memory-hiding named libhide-memory.c. Compile it as hook.so.<br><br>
 Once you have it compiled, you can test it as follows
 ```
-LD_PRELOAD=./libhide.so.3 cat /proc/self/maps
+LD_PRELOAD=./hook.so cat /proc/self/maps
 ```
-This will result in libhide.so.3 not being shown even though we are preloading it. Also works with ldd.<br>
+This will result in hook.so not being shown even though we are preloading it. Also works with ldd.<br>
 
 And finally, it's strange that cat /etc/ld.so.preload is not showing any entries. It appears to not be loading any libraries. However, if we trace the call using strace, we can see, towards the bottom, that another file is being opened when we try to read /etc/ld.so.preload. In this case, a blank /etc/ld.so.preload.dummy file is being opened, so it appears to us that there are no shared libraries being loaded.<br><br>
 Heres what the line looks like when we run strace cat /etc/ld.so.preload
