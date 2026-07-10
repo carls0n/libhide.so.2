@@ -9,7 +9,7 @@ libhide.so.2 hides from all the typical tools that we rely on to tell us whats g
 [+] Hides a specified directory<br>
 [+] Hides entry in /etc/ld.so.preload
 
-Also, you can get a rootshell
+Also, you can get a rootshell once you have the shared library entered into the preloader.
 ```
 rootshell=1 su
 ```
