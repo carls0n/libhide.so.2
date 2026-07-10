@@ -1,3 +1,5 @@
+// Code taken from: https://matheuzsecurity.github.io/hacking/ldpreload-rootkit/. Thank you very much!
+
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <string.h>
