@@ -25,7 +25,7 @@ To make it permanent, do the following:
 sudo cp libhide.so.2 /usr/local/lib
 ```
 ```
-nano /etc/ld.so.preload
+sudo nano /etc/ld.so.preload
 ```
 Enter the path to the shared library
 ```
