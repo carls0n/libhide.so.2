@@ -21,6 +21,10 @@ To test out functions, use the following (for example)
 ```
 LD_PRELOAD=./libhide.so.2 ss -tulpn | grep 8000
 ```
+If you're going to write the shared library to the preloader file:
+```
+sudo cp libhide.so.2 /usr/local/lib/
+```
 To make it more permanent (write .so path to /etc/ld.so.preload), do the following:
 ```
 echo "/usr/local/lib/libhide.so.2" | sudo tee /etc/ld.so.preload
