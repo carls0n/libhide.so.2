@@ -1,6 +1,5 @@
 
 <img width="2028" height="609" alt="libhide2" src="https://github.com/user-attachments/assets/ebe3ea39-f248-48f0-ad66-47b9ee392678" />
-
 libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our system, including:<br>
 
 [+] Hides a process from ps<br>
