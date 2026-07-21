@@ -1,7 +1,5 @@
 
-
-
-<img width="2028" height="609" alt="libhide2" src="https://github.com/user-attachments/assets/63226f26-1306-4373-840d-762aa9255c6a" />
+<img width="2028" height="609" alt="libhide2" src="https://github.com/user-attachments/assets/ebe3ea39-f248-48f0-ad66-47b9ee392678" />
 
 A userland LD_PRELOAD rootkit intended for the purpose of learning a little bit about computer forensics.<br><br>
 libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our system, including<br>
