@@ -1,5 +1,5 @@
 <img width="2028" height="609" alt="libhide2" src="https://github.com/user-attachments/assets/f911ac6c-9611-495d-b2b2-072148f516f6" />
-libhide.so.2 hides information from all the typical tools that we rely on to tell us whats going on with our system, including:<br><br>
+Hides information from all the typical tools that we rely on to tell us whats going on with our system, including:<br><br>
 
 [+] Hides a process from ps<br>
 [+] Hides a port from netstat and ss<br>
