@@ -3,7 +3,7 @@
 libhide.so.2 hides from all the typical tools that we rely on to tell us whats going on with our system, including:<br>
 
 [+] Hides a process from ps<br>
-[+] Hides a specified port from netstat and ss commands<br>
+[+] Hides a port from netstat and ss<br>
 [+] Hides from lsof<br>
 [+] Hides itself (libhide.so.2)<br>
 [+] Hides a specified directory<br>
