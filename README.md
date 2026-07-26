@@ -111,7 +111,7 @@ sudo mv /usr/local/lib/libhide.so.2 /usr/local/lib/libhide.so.2.tmp
 Once that is done,
 you should be able to open the real /etc/ld.so.preload and simply remove the line that loads the shared library (/usr/local/lib/libhide.so.2). Now, our system tools start telling us what is really going on.
 secret_dir is now revealed and also the shared library itself.<br><br>
-You might also enjoy reading <a href="https://carls0n.github.io">defeating ftrace based LKM rootkits for fun and profit</a>
+You might also enjoy reading <a href="https://carls0n.github.io">defeating LKM and LD_PRELOAD rootkits for fun and profit</a>
 
 
 
