@@ -1,5 +1,6 @@
-<p align="center"><img width="507" height="152" alt="libhide2" src="https://github.com/user-attachments/assets/f911ac6c-9611-495d-b2b2-072148f516f6" /></p>
-<br>Hides information from all the typical tools that we rely on to tell us whats going on with our system, including:<br><br>
+<p align="center"><img width="320" height="160" alt="libhide_tiny" src="https://github.com/user-attachments/assets/160cd6a7-9c9f-416a-b020-48bf39de601c" /></p>
+
+Hides information from all the typical tools that we rely on to tell us whats going on with our system, including:<br><br>
 
 [+] Hides a process from ps<br>
 [+] Hides a port from netstat and ss<br>
@@ -9,7 +10,8 @@
 [+] Hides entry in /etc/ld.so.preload
 
 Also, you can get a rootshell once you have the shared library entered into the preloader.
-```
+```<img width="320" height="160" alt="libhide_tiny" src="https://github.com/user-attachments/assets/c6d47ddb-d57d-4f5d-b020-4f4d15749491" />
+
 rootshell=1 su
 ```
 First, compile as a shared library
