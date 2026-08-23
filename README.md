@@ -1,4 +1,4 @@
-<p align="center"><img width="320" height="160" alt="libhide_tiny" src="https://github.com/user-attachments/assets/160cd6a7-9c9f-416a-b020-48bf39de601c" /></p>
+# libhide.so.2<br>
 
 Hides information from all the typical tools that we rely on to tell us whats going on with our system, including:<br>
 
